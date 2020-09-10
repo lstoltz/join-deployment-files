@@ -29,10 +29,10 @@ def appendGPS():
         else:
             coordinates = determineLatLong(gpsFilePath)
             df = pd.read_csv(file)
-            df =  df.assign(latitude_sws =coordinates[0],
-            longitude_sws =coordinates[1],
-            latitude_rws =coordinates[2],
-            longitude_rws =coordinates[3])
+            df =  df.assign(latitude_stop =coordinates[0],
+            longitude_stop =coordinates[1],
+            latitude_start =coordinates[2],
+            longitude_start =coordinates[3])
             df.to_csv(file, index = False) 
 
 def determineLatLong(gpsFilePath):
