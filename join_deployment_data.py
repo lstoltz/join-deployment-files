@@ -3,6 +3,7 @@ from glob import glob
 import pandas as pd
 import fnmatch as fn
 PATH = r"C:\Users\lstol\Documents\repositories\process-data\Data"
+
 ''' Linus Stoltz 9/9/20 ~ Oregon State University
     This script will read all csv and gps files in a specified directory and append the GPS information
     to the excel file.
