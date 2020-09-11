@@ -3,6 +3,7 @@ from glob import glob
 import pandas as pd
 import fnmatch as fn
 PATH = r"C:\Users\lstol\Documents\repositories\process-data\Data"
+BATHY_PATH = r"C:\Users\lstol\Documents\repositories\join-deployment-files\Bathymetry_Oregon_300m_all_NA.txt"
 
 ''' Linus Stoltz 9/9/20 ~ Oregon State University
     This script will read all csv and gps files in a specified directory and append the GPS information
@@ -21,7 +22,8 @@ def findGPS(PATH):
                     for file in glob(os.path.join(path, '*.gps'))]
     return gpsFiles
 
-def appendGPS():
+def appendMiscData():
+    bathy_data = pd.read_csv(BATHY_PATH)
     for file in findCSV(PATH):
         currentCSV = os.path.basename(file)[:-20]
         gpsFilePath = fn.filter(findGPS(PATH), str('*'+currentCSV+'*'))
@@ -34,7 +36,13 @@ def appendGPS():
             longitude_stop =coordinates[1],
             latitude_start =coordinates[2],
             longitude_start =coordinates[3])
-            df.to_csv(file, index = False) 
+            
+    
+            stop_lat_idx = df.iloc(df['latitude_stop'].unique().sub(bathy_data.iloc[:,2])).abs().idxmin()
+            stop_lon_idx = df.iloc(df['longitude_stop'].sub(bathy_data.iloc[:,1])).abs().idxmin()
+            print(stop_lat_idx, stop_lon_idx)
+   # df.to_csv(file, index = False)    
+ 
 
 def determineLatLong(gpsFilePath):
     sws = None
@@ -69,9 +77,9 @@ def determineLatLong(gpsFilePath):
 
 
     return latitude_SWS.strip(), longitude_SWS.strip(), latitude_RWS.strip(), longitude_RWS.strip()
-
     
 def main():
-    appendGPS()
+    appendMiscData()
+    
 
 main()
