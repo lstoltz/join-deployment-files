@@ -4,6 +4,7 @@ import pandas as pd
 import fnmatch as fn
 PATH = r"C:\Users\lstol\Documents\repositories\join-deployment-files\Data"
 BATHY_PATH = r"C:\Users\lstol\Documents\repositories\join-deployment-files\Bathymetry_Oregon_300m_all_NA.txt"
+tempThreshold = 10  # degrees celcius 
 
 ''' Linus Stoltz 9/9/20 ~ Oregon State University
     This script will read all csv and gps files in a specified directory and append the GPS information
@@ -23,6 +24,12 @@ def findGPS(PATH):
                     for file in glob(os.path.join(path, '*.gps'))]
     return gpsFiles
 
+def cleanBadData(df): # removes all values over temp threshold, then deletes the first two entries and the last two entries from the remaining excel file
+    df = df.drop(df[df['DO Temperature (C)'] > tempThreshold].index)
+    df = df.drop(df.head(2).index)
+    df = df.drop(df.tail(2).index)
+    return df
+
 def appendMiscData():
     bathy_data = pd.read_csv(BATHY_PATH,header = None)
     for file in findCSV(PATH):
@@ -33,6 +40,7 @@ def appendMiscData():
         else:
             coordinates = determineLatLong(gpsFilePath)
             df = pd.read_csv(file)
+            df = cleanBadData(df)
             df =  df.assign(latitude_stop =coordinates[0],
             longitude_stop =coordinates[1],
             latitude_start =coordinates[2],
