@@ -7,7 +7,7 @@ BATHY_PATH = r"C:\Users\lstol\Documents\repositories\join-deployment-files\Bathy
 
 ''' Linus Stoltz 9/9/20 ~ Oregon State University
     This script will read all csv and gps files in a specified directory and append the GPS information
-    to the excel file.
+    to the excel file. This script also parses the bathymetry data for Oregon and finds the approximate depth for the start and stop location.
 '''
 
 def findCSV(PATH):
@@ -37,10 +37,10 @@ def appendMiscData():
             latitude_start =coordinates[2],
             longitude_start =coordinates[3])
 
-        
-            print(findStartDepth(coordinates, bathy_data))
-            
-   # df.to_csv(file, index = False)    
+            df = df.assign(depth_stop = findStopDepth(coordinates, bathy_data),
+            depth_start = findStartDepth(coordinates, bathy_data))
+  
+            df.to_csv(file, index = False)    
  
 def findStartDepth(coordinates,bathy_data):
     if coordinates[2] == "N/A" or coordinates[3] == "N/A":
@@ -53,9 +53,9 @@ def findStartDepth(coordinates,bathy_data):
         min_lat_start = idx2[2].sub(float(coordinates[2])).abs()
         start_lat_idx = min_lat_start[min_lat_start == min_lat_start.min()]
 
-        start_depth = idx2.loc[start_lat_idx.index]
+        start_depth = idx2.loc[start_lat_idx.index][0]
 
-        return start_depth, "no"
+        return round(start_depth.values[0],2)
 
 def findStopDepth(coordinates, bathy_data):
     if coordinates[0] =="N/A" or coordinates[1] == "N/A":
@@ -68,9 +68,9 @@ def findStopDepth(coordinates, bathy_data):
         min_lat_stop = idx1[2].sub(float(coordinates[0])).abs()
         stop_lat_idx = min_lat_stop[min_lat_stop == min_lat_stop.min()]
 
-        stop_depth = idx1.loc[stop_lat_idx.index]
+        stop_depth = idx1.loc[stop_lat_idx.index][0]
 
-        return stop_depth, "yes"
+        return round(stop_depth.values[0],2)
 
 def determineLatLong(gpsFilePath):
     sws = None
