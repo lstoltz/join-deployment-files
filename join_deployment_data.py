@@ -105,9 +105,14 @@ def determineLatLong(gpsFilePath):
 
 
     return latitude_SWS.strip(), longitude_SWS.strip(), latitude_RWS.strip(), longitude_RWS.strip()
+
+def combineData():
+    combined_csv = pd.concat([pd.read_csv(f) for f in findCSV(PATH)])
+    combined_csv.to_csv("combined_csv.csv", index=False, encoding='utf-8-sig', na_rep = 'NaN')
     
 def main():
     appendMiscData()
+    combineData()
     
 
 main()
