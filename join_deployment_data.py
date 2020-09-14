@@ -2,7 +2,7 @@ import os
 from glob import glob
 import pandas as pd
 import fnmatch as fn
-PATH = r"C:\Users\lstol\Documents\repositories\process-data\Data"
+PATH = r"C:\Users\lstol\Documents\repositories\join-deployment-files\Data"
 BATHY_PATH = r"C:\Users\lstol\Documents\repositories\join-deployment-files\Bathymetry_Oregon_300m_all_NA.txt"
 
 ''' Linus Stoltz 9/9/20 ~ Oregon State University
@@ -23,7 +23,7 @@ def findGPS(PATH):
     return gpsFiles
 
 def appendMiscData():
-    bathy_data = pd.read_csv(BATHY_PATH)
+    bathy_data = pd.read_csv(BATHY_PATH,header = None)
     for file in findCSV(PATH):
         currentCSV = os.path.basename(file)[:-20]
         gpsFilePath = fn.filter(findGPS(PATH), str('*'+currentCSV+'*'))
@@ -36,13 +36,41 @@ def appendMiscData():
             longitude_stop =coordinates[1],
             latitude_start =coordinates[2],
             longitude_start =coordinates[3])
+
+        
+            print(findStartDepth(coordinates, bathy_data))
             
-    
-            stop_lat_idx = df.iloc(df['latitude_stop'].unique().sub(bathy_data.iloc[:,2])).abs().idxmin()
-            stop_lon_idx = df.iloc(df['longitude_stop'].sub(bathy_data.iloc[:,1])).abs().idxmin()
-            print(stop_lat_idx, stop_lon_idx)
    # df.to_csv(file, index = False)    
  
+def findStartDepth(coordinates,bathy_data):
+    if coordinates[2] == "N/A" or coordinates[3] == "N/A":
+        return "N/A"
+    else:
+        min_lon_start = bathy_data[1].sub(float(coordinates[3])).abs()
+        start_lon_idx = min_lon_start[min_lon_start == min_lon_start.min()]
+        idx2 = bathy_data.loc[start_lon_idx.index]
+
+        min_lat_start = idx2[2].sub(float(coordinates[2])).abs()
+        start_lat_idx = min_lat_start[min_lat_start == min_lat_start.min()]
+
+        start_depth = idx2.loc[start_lat_idx.index]
+
+        return start_depth, "no"
+
+def findStopDepth(coordinates, bathy_data):
+    if coordinates[0] =="N/A" or coordinates[1] == "N/A":
+        return "N/A"
+    else:
+        min_lon_stop = bathy_data[1].sub(float(coordinates[1])).abs()
+        stop_lon_idx = min_lon_stop[min_lon_stop == min_lon_stop.min()]
+        idx1 = bathy_data.loc[stop_lon_idx.index]
+
+        min_lat_stop = idx1[2].sub(float(coordinates[0])).abs()
+        stop_lat_idx = min_lat_stop[min_lat_stop == min_lat_stop.min()]
+
+        stop_depth = idx1.loc[stop_lat_idx.index]
+
+        return stop_depth, "yes"
 
 def determineLatLong(gpsFilePath):
     sws = None
