@@ -8,6 +8,7 @@ BATHY_PATH = r"C:\Users\lstol\Documents\repositories\join-deployment-files\Bathy
 ''' Linus Stoltz 9/9/20 ~ Oregon State University
     This script will read all csv and gps files in a specified directory and append the GPS information
     to the excel file. This script also parses the bathymetry data for Oregon and finds the approximate depth for the start and stop location.
+    Concatenates data files into one csv file for easier manipulation. 
 '''
 
 def findCSV(PATH):
@@ -40,7 +41,7 @@ def appendMiscData():
             df = df.assign(depth_stop = findStopDepth(coordinates, bathy_data),
             depth_start = findStartDepth(coordinates, bathy_data))
   
-            df.to_csv(file, index = False)    
+            df.to_csv(file, index = False, encoding='utf-8-sig', na_rep = 'NaN')    
  
 def findStartDepth(coordinates,bathy_data):
     if coordinates[2] == "N/A" or coordinates[3] == "N/A":
@@ -114,5 +115,4 @@ def main():
     appendMiscData()
     combineData()
     
-
 main()
