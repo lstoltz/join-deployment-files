@@ -34,6 +34,7 @@ def appendMiscData():
     bathy_data = pd.read_csv(BATHY_PATH,header = None)
     for file in findCSV(PATH):
         currentCSV = os.path.basename(file)[:-20]
+        logger_sn = os.path.basename(file)[:7]
         gpsFilePath = fn.filter(findGPS(PATH), str('*'+currentCSV+'*'))
         if gpsFilePath == []:
             pass
@@ -45,6 +46,7 @@ def appendMiscData():
             longitude_stop =coordinates[1],
             latitude_start =coordinates[2],
             longitude_start =coordinates[3],
+            logger_sn = logger_sn,
             trip_id = uuid.uuid4())
 
             df = df.assign(depth_stop = findStopDepth(coordinates, bathy_data),
