@@ -1,4 +1,4 @@
-import os
+import os, uuid
 from glob import glob
 import pandas as pd
 import fnmatch as fn
@@ -44,7 +44,8 @@ def appendMiscData():
             df =  df.assign(latitude_stop =coordinates[0],
             longitude_stop =coordinates[1],
             latitude_start =coordinates[2],
-            longitude_start =coordinates[3])
+            longitude_start =coordinates[3],
+            trip_id = uuid.uuid4())
 
             df = df.assign(depth_stop = findStopDepth(coordinates, bathy_data),
             depth_start = findStartDepth(coordinates, bathy_data))
