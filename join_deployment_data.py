@@ -4,7 +4,10 @@ import pandas as pd
 import fnmatch as fn
 PATH = r"C:\Users\lstol\Documents\repositories\join-deployment-files\Data"
 BATHY_PATH = r"C:\Users\lstol\Documents\repositories\join-deployment-files\Bathymetry_Oregon_300m_all_NA.txt"
-tempThreshold = 10  # degrees celcius 
+DEST = r"C:\Users\lstol\Documents\Repositories\join-deployment-files\completed"
+FLAG = r"C:\Users\lstol\Documents\Repositories\join-deployment-files\flagged"
+
+tempThreshold = 11  # degrees celcius 
 
 ''' Linus Stoltz 9/9/20 ~ Oregon State University
     This script will read all csv and gps files in a specified directory and append the GPS information
@@ -37,7 +40,9 @@ def appendMiscData():
         logger_sn = os.path.basename(file)[:7]
         gpsFilePath = fn.filter(findGPS(PATH), str('*'+currentCSV+'*'))
         if gpsFilePath == []:
-            pass
+            flagged_file = os.path.join(FLAG, os.path.basename(file))
+            df = pd.read_csv(file)
+            df.to_csv(flagged_file, index = False, encoding='utf-8-sig', na_rep = 'NaN')
         else:
             coordinates = determineLatLong(gpsFilePath)
             df = pd.read_csv(file)
@@ -51,8 +56,9 @@ def appendMiscData():
 
             df = df.assign(depth_stop = findStopDepth(coordinates, bathy_data),
             depth_start = findStartDepth(coordinates, bathy_data))
-  
-            df.to_csv(file, index = False, encoding='utf-8-sig', na_rep = 'NaN')    
+
+            output_file = os.path.join(DEST, os.path.basename(file))
+            df.to_csv(output_file, index = False, encoding='utf-8-sig', na_rep = 'NaN')    
  
 def findStartDepth(coordinates,bathy_data):
     if coordinates[2] == "N/A" or coordinates[3] == "N/A":
@@ -119,7 +125,7 @@ def determineLatLong(gpsFilePath):
     return latitude_SWS.strip(), longitude_SWS.strip(), latitude_RWS.strip(), longitude_RWS.strip()
 
 def combineData():
-    combined_csv = pd.concat([pd.read_csv(f) for f in findCSV(PATH)])
+    combined_csv = pd.concat([pd.read_csv(f) for f in findCSV(DEST)])
     combined_csv.to_csv("combined_csv.csv", index=False, encoding='utf-8-sig', na_rep = 'NaN')
     
 def main():

@@ -4,3 +4,5 @@ Data/
 Bathymetry_Oregon_300m_all_NA.txt
 test/
 combined_csv.csv
+completed/
+flagged/
