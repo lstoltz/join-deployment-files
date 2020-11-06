@@ -8,6 +8,7 @@ DEST = r"C:\Users\lstol\Documents\Repositories\join-deployment-files\completed"
 FLAG = r"C:\Users\lstol\Documents\Repositories\join-deployment-files\flagged"
 
 tempThreshold = 11  # degrees celcius 
+TpercentThreshold = 85
 
 ''' Linus Stoltz 9/9/20 ~ Oregon State University
     This script will read all csv and gps files in a specified directory and append the GPS information
@@ -28,6 +29,7 @@ def findGPS(PATH):
     return gpsFiles
 
 def cleanBadData(df): # removes all values over temp threshold, then deletes the first two entries and the last two entries from the remaining excel file
+   # df = df.drop(df[df['Dissolved Oxygen (%)'] > TpercentThreshold].index)
     df = df.drop(df[df['DO Temperature (C)'] > tempThreshold].index)
     df = df.drop(df.head(2).index)
     df = df.drop(df.tail(2).index)
@@ -54,8 +56,8 @@ def appendMiscData():
             logger_sn = logger_sn,
             trip_id = uuid.uuid4())
 
-            df = df.assign(depth_stop = findStopDepth(coordinates, bathy_data),
-            depth_start = findStartDepth(coordinates, bathy_data))
+            # df = df.assign(depth_stop = findStopDepth(coordinates, bathy_data),
+            # depth_start = findStartDepth(coordinates, bathy_data))
 
             output_file = os.path.join(DEST, os.path.basename(file))
             df.to_csv(output_file, index = False, encoding='utf-8-sig', na_rep = 'NaN')    
@@ -126,7 +128,7 @@ def determineLatLong(gpsFilePath):
 
 def combineData():
     combined_csv = pd.concat([pd.read_csv(f) for f in findCSV(DEST)])
-    combined_csv.to_csv("combined_csv.csv", index=False, encoding='utf-8-sig', na_rep = 'NaN')
+    combined_csv.to_csv("combined_Tindex_csv.csv", index=False, encoding='utf-8-sig', na_rep = 'NaN')
     
 def main():
     appendMiscData()
