@@ -28,12 +28,6 @@ def findGPS(PATH):
                     for file in glob(os.path.join(path, '*.gps'))]
     return gpsFiles
 
-def cleanBadData(df): # removes all values over temp threshold, then deletes the first two entries and the last two entries from the remaining excel file
-   # df = df.drop(df[df['Dissolved Oxygen (%)'] > TpercentThreshold].index)
-    df = df.drop(df[df['DO Temperature (C)'] > tempThreshold].index)
-    df = df.drop(df.head(2).index)
-    df = df.drop(df.tail(2).index)
-    return df
 
 def appendMiscData():
     bathy_data = pd.read_csv(BATHY_PATH,header = None)
@@ -48,7 +42,6 @@ def appendMiscData():
         else:
             coordinates = determineLatLong(gpsFilePath)
             df = pd.read_csv(file)
-            df = cleanBadData(df)
             df =  df.assign(latitude_stop =coordinates[0],
             longitude_stop =coordinates[1],
             latitude_start =coordinates[2],
