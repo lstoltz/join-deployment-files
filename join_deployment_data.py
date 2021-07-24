@@ -2,13 +2,14 @@ import os, uuid
 from glob import glob
 import pandas as pd
 import fnmatch as fn
-PATH = r"C:\Users\lstol\Documents\repositories\join-deployment-files\Data"
-BATHY_PATH = r"C:\Users\lstol\Documents\repositories\join-deployment-files\Bathymetry_Oregon_300m_all_NA.txt"
-DEST = r"C:\Users\lstol\Documents\Repositories\join-deployment-files\completed"
-FLAG = r"C:\Users\lstol\Documents\Repositories\join-deployment-files\flagged"
+from dotenv import load_dotenv
 
-tempThreshold = 11  # degrees celcius 
-TpercentThreshold = 85
+load_dotenv()
+
+SRC = os.getenv("SRC")
+BATHY_PATH = os.getenv("BATHY_PATH")
+DEST = os.getenv("DEST")
+FLAG = os.getenv("FLAG")
 
 ''' Linus Stoltz 9/9/20 ~ Oregon State University
     This script will read all csv and gps files in a specified directory and append the GPS information
@@ -16,25 +17,25 @@ TpercentThreshold = 85
     Concatenates data files into one csv file for easier manipulation. 
 '''
 
-def findCSV(PATH):
+def findCSV(SRC):
     csvFiles = [file
-                    for path, subdir, files in os.walk(PATH) # find all csv files in a directory
+                    for path, subdir, files in os.walk(SRC) # find all csv files in a directory
                     for file in glob(os.path.join(path, '*.csv'))]
     return csvFiles
 
-def findGPS(PATH):
+def findGPS(SRC):
     gpsFiles = [file
-                    for path, subdir, files in os.walk(PATH) # find all csv files in a directory
+                    for path, subdir, files in os.walk(SRC) # find all csv files in a directory
                     for file in glob(os.path.join(path, '*.gps'))]
     return gpsFiles
 
 
 def appendMiscData():
     bathy_data = pd.read_csv(BATHY_PATH,header = None)
-    for file in findCSV(PATH):
+    for file in findCSV(SRC):
         currentCSV = os.path.basename(file)[:-20]
         logger_sn = os.path.basename(file)[:7]
-        gpsFilePath = fn.filter(findGPS(PATH), str('*'+currentCSV+'*'))
+        gpsFilePath = fn.filter(findGPS(SRC), str('*'+currentCSV+'*'))
         if gpsFilePath == []:
             flagged_file = os.path.join(FLAG, os.path.basename(file))
             df = pd.read_csv(file)
