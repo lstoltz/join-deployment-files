@@ -5,3 +5,4 @@ test/
 completed/
 flagged/
 *.csv
+.env
