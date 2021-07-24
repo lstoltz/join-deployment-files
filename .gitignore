@@ -1,7 +1,7 @@
 .vscode/
 env/
 Data/
-Bathymetry_Oregon_300m_all_NA.txt
+
 test/
 completed/
 flagged/
